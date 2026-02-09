@@ -15,3 +15,35 @@ body {
   scrollbar-width: none;
 }
 
+/* رسائل الفلاش */
+.flash-toast {
+  animation: flashSlideIn 0.3s ease-out;
+}
+
+.flash-toast.fade-out {
+  animation: flashFadeOut 0.3s ease-in forwards;
+}
+
+@keyframes flashSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes flashFadeOut {
+  to {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+/* حدود خاطئة للتحقق */
+.input-error {
+  border-color: rgb(248 113 113) !important;
+}
+

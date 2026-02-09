@@ -151,8 +151,11 @@
                     id="addTitleInput"
                     type="text"
                     required
-                    class="rounded-lg border border-slate-200 bg-base-50 px-2.5 py-1.5 outline-none transition-colors focus:border-primary-500 focus:bg-white"
+                    maxlength="255"
+                    class="rounded-lg border border-slate-200 bg-base-50 px-2.5 py-1.5 outline-none transition-colors focus:border-primary-500 focus:bg-white invalid:border-red-400"
+                    data-validate="required"
                   />
+                  <span id="addTitleError" class="text-[10px] text-red-600 hidden"></span>
                 </div>
 
                 <div class="flex flex-col gap-1">
@@ -163,9 +166,12 @@
                     id="addUrlInput"
                     type="url"
                     required
+                    maxlength="2048"
                     placeholder="https://..."
-                    class="rounded-lg border border-slate-200 bg-base-50 px-2.5 py-1.5 outline-none transition-colors focus:border-primary-500 focus:bg-white"
+                    class="rounded-lg border border-slate-200 bg-base-50 px-2.5 py-1.5 outline-none transition-colors focus:border-primary-500 focus:bg-white invalid:border-red-400"
+                    data-validate="required,url"
                   />
+                  <span id="addUrlError" class="text-[10px] text-red-600 hidden"></span>
                 </div>
 
                 <div class="flex flex-col gap-1">
@@ -303,8 +309,11 @@
                 id="editTitleInput"
                 type="text"
                 required
-                class="rounded-lg border border-slate-200 bg-base-50 px-3 py-2 text-sm outline-none transition-colors focus:border-primary-500 focus:bg-white"
+                maxlength="255"
+                class="rounded-lg border border-slate-200 bg-base-50 px-3 py-2 text-sm outline-none transition-colors focus:border-primary-500 focus:bg-white invalid:border-red-400"
+                data-validate="required"
               />
+              <span id="editTitleError" class="text-[10px] text-red-600 hidden"></span>
             </div>
 
             <div class="flex flex-col gap-1.5">
@@ -318,9 +327,12 @@
                 id="editUrlInput"
                 type="url"
                 required
+                maxlength="2048"
                 placeholder="https://..."
-                class="rounded-lg border border-slate-200 bg-base-50 px-3 py-2 text-sm outline-none transition-colors focus:border-primary-500 focus:bg-white"
+                class="rounded-lg border border-slate-200 bg-base-50 px-3 py-2 text-sm outline-none transition-colors focus:border-primary-500 focus:bg-white invalid:border-red-400"
+                data-validate="required,url"
               />
+              <span id="editUrlError" class="text-[10px] text-red-600 hidden"></span>
             </div>
 
             <div class="flex flex-col gap-1.5">
@@ -452,6 +464,12 @@
         </div>
       </div>
     </div>
+
+    <!-- حاوية رسائل الفلاش -->
+    <div
+      id="flashContainer"
+      class="fixed top-4 left-4 right-4 z-[60] flex flex-col gap-2 sm:left-auto sm:right-4 sm:w-80"
+    ></div>
 
     <!-- SQL.js library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.js"></script>

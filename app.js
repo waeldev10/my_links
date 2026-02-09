@@ -36,9 +36,19 @@ const messageTitle = document.getElementById("messageTitle");
 const messageText = document.getElementById("messageText");
 const closeMessageModal = document.getElementById("closeMessageModal");
 
+// عناصر رسائل الخطأ
+const addTitleError = document.getElementById("addTitleError");
+const addUrlError = document.getElementById("addUrlError");
+const editTitleError = document.getElementById("editTitleError");
+const editUrlError = document.getElementById("editUrlError");
+const flashContainer = document.getElementById("flashContainer");
+
 // متغيرات حالة
 let currentEditId = null;
 let currentDeleteId = null;
+
+// ثوابت التحقق
+const URL_REGEX = /^https?:\/\/.+\..+/i;
 
 // الحالة الحالية للفلاتر
 let state = {
@@ -49,6 +59,133 @@ let state = {
 // حالة التحميل
 let isDatabaseReady = false;
 let allLinksCache = [];
+
+// ========== التحقق من الحقول ==========
+function isValidUrl(str) {
+  if (!str || typeof str !== "string") return false;
+  const trimmed = str.trim();
+  if (!trimmed) return false;
+  try {
+    new URL(trimmed);
+    return URL_REGEX.test(trimmed);
+  } catch {
+    return false;
+  }
+}
+
+function showFieldError(errorEl, message) {
+  if (!errorEl) return;
+  errorEl.textContent = message;
+  errorEl.classList.remove("hidden");
+  errorEl.previousElementSibling?.classList.add("input-error");
+}
+
+function clearFieldError(errorEl) {
+  if (!errorEl) return;
+  errorEl.textContent = "";
+  errorEl.classList.add("hidden");
+  errorEl.previousElementSibling?.classList.remove("input-error");
+}
+
+function clearAddFormErrors() {
+  clearFieldError(addTitleError);
+  addTitleInput?.classList.remove("input-error");
+  clearFieldError(addUrlError);
+  addUrlInput?.classList.remove("input-error");
+}
+
+function clearEditFormErrors() {
+  clearFieldError(editTitleError);
+  editTitleInput?.classList.remove("input-error");
+  clearFieldError(editUrlError);
+  editUrlInput?.classList.remove("input-error");
+}
+
+function validateAddForm() {
+  clearAddFormErrors();
+  let isValid = true;
+
+  const title = (addTitleInput?.value || "").trim();
+  const url = (addUrlInput?.value || "").trim();
+
+  if (!title) {
+    showFieldError(addTitleError, "الرجاء إدخال عنوان الموقع");
+    isValid = false;
+  }
+
+  if (!url) {
+    showFieldError(addUrlError, "الرجاء إدخال رابط الموقع");
+    isValid = false;
+  } else if (!isValidUrl(url)) {
+    showFieldError(addUrlError, "الرجاء إدخال رابط صحيح يبدأ بـ http أو https");
+    isValid = false;
+  }
+
+  return isValid;
+}
+
+function validateEditForm() {
+  clearEditFormErrors();
+  let isValid = true;
+
+  const title = (editTitleInput?.value || "").trim();
+  const url = (editUrlInput?.value || "").trim();
+
+  if (!title) {
+    showFieldError(editTitleError, "الرجاء إدخال عنوان الموقع");
+    isValid = false;
+  }
+
+  if (!url) {
+    showFieldError(editUrlError, "الرجاء إدخال رابط الموقع");
+    isValid = false;
+  } else if (!isValidUrl(url)) {
+    showFieldError(editUrlError, "الرجاء إدخال رابط صحيح يبدأ بـ http أو https");
+    isValid = false;
+  }
+
+  return isValid;
+}
+
+// إزالة رسائل الخطأ عند الكتابة
+function setupValidationListeners() {
+  [addTitleInput, addUrlInput].forEach((input) => {
+    input?.addEventListener("input", () => {
+      clearAddFormErrors();
+    });
+  });
+  [editTitleInput, editUrlInput].forEach((input) => {
+    input?.addEventListener("input", () => {
+      clearEditFormErrors();
+    });
+  });
+}
+
+// ========== رسائل الفلاش ==========
+function showFlashSuccess(message, duration = 3500) {
+  if (!flashContainer) return;
+
+  const toast = document.createElement("div");
+  toast.className =
+    "flash-toast flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800";
+  toast.innerHTML = `
+    <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+      </svg>
+    </span>
+    <span class="flex-1">${message}</span>
+  `;
+
+  flashContainer.appendChild(toast);
+
+  const removeToast = () => {
+    toast.classList.add("fade-out");
+    setTimeout(() => toast.remove(), 300);
+  };
+
+  setTimeout(removeToast, duration);
+}
 
 // عرض رسالة في modal
 function showMessage(title, text) {
@@ -276,8 +413,7 @@ async function handleAddLink(event) {
   const description = (addDescriptionInput?.value || "").trim();
   const tagsRaw = (addTagsInput?.value || "").trim();
 
-  if (!title || !url) {
-    showMessage("تنبيه", "الرجاء إدخال العنوان والرابط");
+  if (!validateAddForm()) {
     return;
   }
 
@@ -299,7 +435,10 @@ async function handleAddLink(event) {
 
     if (addLinkForm) {
       addLinkForm.reset();
+      clearAddFormErrors();
     }
+
+    showFlashSuccess("تمت إضافة الرابط بنجاح");
 
     // إعادة تحميل البيانات وعرضها
     await loadAllLinks();
@@ -333,6 +472,7 @@ async function confirmDelete() {
 
   try {
     await deleteLink(currentDeleteId);
+    showFlashSuccess("تم حذف الرابط بنجاح");
     await loadAllLinks();
     await renderCategories();
     await renderLinks();
@@ -363,6 +503,7 @@ async function openEditModal(id) {
     }
 
     currentEditId = id;
+    clearEditFormErrors();
     editTitleInput.value = current.title;
     editUrlInput.value = current.url;
     editCategoryInput.value = current.category || "";
@@ -392,8 +533,7 @@ async function handleEditSubmit(event) {
   const description = (editDescriptionInput?.value || "").trim();
   const tagsRaw = (editTagsInput?.value || "").trim();
 
-  if (!title || !url) {
-    showMessage("تنبيه", "الرجاء إدخال العنوان والرابط");
+  if (!validateEditForm()) {
     return;
   }
 
@@ -413,6 +553,7 @@ async function handleEditSubmit(event) {
       tags,
     });
 
+    showFlashSuccess("تم حفظ التعديلات بنجاح");
     await loadAllLinks();
     await renderCategories();
     await renderLinks();
@@ -471,6 +612,8 @@ function initEvents() {
   if (editLinkForm) {
     editLinkForm.addEventListener("submit", handleEditSubmit);
   }
+
+  setupValidationListeners();
   if (closeEditModal) {
     closeEditModal.addEventListener("click", closeAllModals);
   }
