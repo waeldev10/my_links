@@ -1,0 +1,17 @@
+/* تخصيصات بسيطة فوق تايلويند للحفاظ على طابع نظيف وبعيد عن المبالغة */
+
+html,
+body {
+  scroll-behavior: smooth;
+}
+
+/* إخفاء سكرول التصنيفات في بعض المتصفحات مع بقاء السحب */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+

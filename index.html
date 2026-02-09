@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>مكتبتي للروابط</title>
+
+    <!-- Google Font: Almarai -->
+    <link
+      rel="preconnect"
+      href="https://fonts.googleapis.com"
+    />
+    <link
+      rel="preconnect"
+      href="https://fonts.gstatic.com"
+      crossorigin
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Almarai", "system-ui", "sans-serif"],
+            },
+            colors: {
+              base: {
+                50: "#f8fafc",
+                100: "#f1f5f9",
+              },
+              primary: {
+                50: "#eef2ff",
+                100: "#e0e7ff",
+                500: "#4f46e5",
+                600: "#4338ca",
+              },
+              accent: {
+                100: "#fef3c7",
+                200: "#fde68a",
+              },
+            },
+          },
+        },
+      };
+    </script>
+
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+
+  <body class="min-h-screen bg-base-50 text-slate-900 font-sans">
+    <!-- Page wrapper -->
+    <div class="flex min-h-screen flex-col">
+      <!-- Top nav -->
+      <header
+        class="border-b border-slate-200 bg-white/80 backdrop-blur-sm sticky top-0 z-20"
+      >
+        <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:py-4">
+          <div class="flex items-center gap-3">
+            <div
+              class="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-base-100 text-sm font-semibold tracking-tight"
+            >
+              WL
+            </div>
+            <div>
+              <h1 class="text-base sm:text-lg font-semibold tracking-tight">
+                مكتبتي للروابط
+              </h1>
+              <p class="mt-0.5 text-xs sm:text-sm text-slate-500">
+                تغذية بصرية مرتبة بدل التشتّت
+              </p>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main content -->
+      <main class="flex-1">
+        <section class="mx-auto max-w-6xl px-4 py-6 sm:py-10">
+          <!-- Filters + add form -->
+          <div
+            class="flex flex-col gap-4 border border-slate-200 bg-white px-4 py-4 sm:rounded-2xl sm:px-5 sm:py-5"
+          >
+            <!-- Search -->
+            <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+              <label
+                for="searchInput"
+                class="text-xs font-medium text-slate-500 sm:w-24"
+              >
+                البحث
+              </label>
+              <div class="relative flex-1">
+                <input
+                  id="searchInput"
+                  type="search"
+                  placeholder="ابحث عن موقع، كلمة مفتاحية أو تصنيف..."
+                  class="w-full rounded-xl border border-slate-200 bg-base-50 px-3.5 py-2.5 text-sm outline-none transition-colors focus:border-primary-500 focus:bg-white"
+                />
+              </div>
+            </div>
+
+            <!-- Categories -->
+            <div class="flex flex-col gap-2">
+              <div class="flex items-center justify-between gap-4">
+                <span class="text-xs font-medium text-slate-500">
+                  التصنيفات
+                </span>
+                <button
+                  id="resetFiltersBtn"
+                  class="text-[11px] text-slate-500 underline-offset-2 hover:text-slate-700 hover:underline"
+                  type="button"
+                >
+                  إعادة التعيين
+                </button>
+              </div>
+
+              <div
+                id="categoriesContainer"
+                class="no-scrollbar -mx-1 flex flex-wrap gap-1.5 pb-1 pt-0.5 sm:flex-nowrap sm:overflow-x-auto"
+              >
+                <!-- Filled by JS -->
+              </div>
+            </div>
+
+            <!-- Add new link -->
+            <div class="border-t border-slate-100 pt-3">
+              <div class="mb-2 flex items-center justify-between gap-3">
+                <span class="text-xs font-medium text-slate-500">
+                  إضافة رابط جديد
+                </span>
+                <span class="text-[11px] text-slate-400">
+                  الروابط تُحفَظ في قاعدة بيانات SQLite محلياً.
+                </span>
+              </div>
+
+              <form
+                id="addLinkForm"
+                class="grid gap-2 text-xs sm:grid-cols-3"
+                autocomplete="off"
+              >
+                <div class="flex flex-col gap-1">
+                  <label for="addTitleInput" class="text-[11px] text-slate-600">
+                    عنوان الموقع
+                  </label>
+                  <input
+                    id="addTitleInput"
+                    type="text"
+                    required
+                    class="rounded-lg border border-slate-200 bg-base-50 px-2.5 py-1.5 outline-none transition-colors focus:border-primary-500 focus:bg-white"
+                  />
+                </div>
+
+                <div class="flex flex-col gap-1">
+                  <label for="addUrlInput" class="text-[11px] text-slate-600">
+                    رابط الموقع
+                  </label>
+                  <input
+                    id="addUrlInput"
+                    type="url"
+                    required
+                    placeholder="https://..."
+                    class="rounded-lg border border-slate-200 bg-base-50 px-2.5 py-1.5 outline-none transition-colors focus:border-primary-500 focus:bg-white"
+                  />
+                </div>
+
+                <div class="flex flex-col gap-1">
+                  <label
+                    for="addCategoryInput"
+                    class="text-[11px] text-slate-600"
+                  >
+                    التصنيف
+                  </label>
+                  <input
+                    id="addCategoryInput"
+                    type="text"
+                    placeholder="أخبار، مدونات، بنوك..."
+                    class="rounded-lg border border-slate-200 bg-base-50 px-2.5 py-1.5 outline-none transition-colors focus:border-primary-500 focus:bg-white"
+                  />
+                </div>
+
+                <div class="flex flex-col gap-1 sm:col-span-3">
+                  <label
+                    for="addDescriptionInput"
+                    class="text-[11px] text-slate-600"
+                  >
+                    وصف مختصر
+                  </label>
+                  <textarea
+                    id="addDescriptionInput"
+                    rows="2"
+                    class="resize-none rounded-lg border border-slate-200 bg-base-50 px-2.5 py-1.5 outline-none transition-colors focus:border-primary-500 focus:bg-white"
+                  ></textarea>
+                </div>
+
+                <div class="flex flex-col gap-1 sm:col-span-2">
+                  <label for="addTagsInput" class="text-[11px] text-slate-600">
+                    الكلمات المفتاحية (اختياري)
+                  </label>
+                  <input
+                    id="addTagsInput"
+                    type="text"
+                    placeholder="تصميم، بنوك، واجهات... (تفصلها بفاصلة)"
+                    class="rounded-lg border border-slate-200 bg-base-50 px-2.5 py-1.5 outline-none transition-colors focus:border-primary-500 focus:bg-white"
+                  />
+                </div>
+
+                <div class="flex items-end justify-start sm:col-span-1">
+                  <button
+                    type="submit"
+                    class="w-full rounded-lg border border-slate-900 bg-slate-900 px-3 py-2 text-[11px] font-medium text-white transition-colors hover:bg-transparent hover:text-slate-900"
+                  >
+                    إضافة الرابط
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Links grid -->
+          <div class="mt-5 sm:mt-7">
+            <div class="mb-3 flex items-center justify-between text-xs text-slate-500">
+              <span id="resultCount">0 روابط</span>
+            </div>
+
+            <div
+              id="linksContainer"
+              class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3"
+            >
+              <!-- Filled by JS -->
+            </div>
+
+            <div
+              id="emptyState"
+              class="hidden rounded-2xl border border-dashed border-slate-200 bg-white px-4 py-10 text-center text-sm text-slate-500"
+            >
+              لا توجد نتائج مطابقة لبحثك حاليًا.
+              <br class="hidden sm:inline" />
+              جرّب تعديل الكلمة أو اختيار تصنيف مختلف.
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <!-- Footer -->
+      <footer class="border-t border-slate-200 bg-white/70">
+        <div
+          class="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-4 text-[11px] text-slate-500 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <p>مصمَّم ومطوَّر كمكتبة شخصية للروابط.</p>
+          <p class="sm:text-left">
+            واجهة بسيطة بلا مؤثرات مبالغ فيها؛ تركيز على المحتوى والتنظيم.
+          </p>
+        </div>
+      </footer>
+    </div>
+
+    <!-- Modal للتعديل -->
+    <div
+      id="editModal"
+      class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40 p-4"
+    >
+      <div
+        class="w-full max-w-lg rounded-2xl border border-slate-200 bg-white shadow-lg"
+      >
+        <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+          <h2 class="text-base font-semibold text-slate-900">تعديل الرابط</h2>
+          <button
+            id="closeEditModal"
+            type="button"
+            class="text-slate-400 hover:text-slate-600"
+          >
+            <svg
+              class="h-5 w-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
+
+        <form id="editLinkForm" class="p-5">
+          <div class="space-y-4">
+            <div class="flex flex-col gap-1.5">
+              <label
+                for="editTitleInput"
+                class="text-xs font-medium text-slate-600"
+              >
+                عنوان الموقع
+              </label>
+              <input
+                id="editTitleInput"
+                type="text"
+                required
+                class="rounded-lg border border-slate-200 bg-base-50 px-3 py-2 text-sm outline-none transition-colors focus:border-primary-500 focus:bg-white"
+              />
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+              <label
+                for="editUrlInput"
+                class="text-xs font-medium text-slate-600"
+              >
+                رابط الموقع
+              </label>
+              <input
+                id="editUrlInput"
+                type="url"
+                required
+                placeholder="https://..."
+                class="rounded-lg border border-slate-200 bg-base-50 px-3 py-2 text-sm outline-none transition-colors focus:border-primary-500 focus:bg-white"
+              />
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+              <label
+                for="editCategoryInput"
+                class="text-xs font-medium text-slate-600"
+              >
+                التصنيف
+              </label>
+              <input
+                id="editCategoryInput"
+                type="text"
+                placeholder="أخبار، مدونات، بنوك..."
+                class="rounded-lg border border-slate-200 bg-base-50 px-3 py-2 text-sm outline-none transition-colors focus:border-primary-500 focus:bg-white"
+              />
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+              <label
+                for="editDescriptionInput"
+                class="text-xs font-medium text-slate-600"
+              >
+                وصف مختصر
+              </label>
+              <textarea
+                id="editDescriptionInput"
+                rows="3"
+                class="resize-none rounded-lg border border-slate-200 bg-base-50 px-3 py-2 text-sm outline-none transition-colors focus:border-primary-500 focus:bg-white"
+              ></textarea>
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+              <label
+                for="editTagsInput"
+                class="text-xs font-medium text-slate-600"
+              >
+                الكلمات المفتاحية (اختياري)
+              </label>
+              <input
+                id="editTagsInput"
+                type="text"
+                placeholder="تصميم، بنوك، واجهات... (تفصلها بفاصلة)"
+                class="rounded-lg border border-slate-200 bg-base-50 px-3 py-2 text-sm outline-none transition-colors focus:border-primary-500 focus:bg-white"
+              />
+            </div>
+          </div>
+
+          <div class="mt-6 flex gap-3">
+            <button
+              type="button"
+              id="cancelEditBtn"
+              class="flex-1 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
+            >
+              إلغاء
+            </button>
+            <button
+              type="submit"
+              class="flex-1 rounded-lg border border-slate-900 bg-slate-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-800"
+            >
+              حفظ التعديلات
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal للتأكيد على الحذف -->
+    <div
+      id="deleteModal"
+      class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40 p-4"
+    >
+      <div
+        class="w-full max-w-md rounded-2xl border border-slate-200 bg-white shadow-lg"
+      >
+        <div class="p-5">
+          <h2 class="mb-2 text-base font-semibold text-slate-900">
+            تأكيد الحذف
+          </h2>
+          <p class="mb-6 text-sm text-slate-600">
+            هل أنت متأكد من حذف هذا الرابط؟ لا يمكن التراجع عن هذه العملية.
+          </p>
+          <div class="flex gap-3">
+            <button
+              type="button"
+              id="cancelDeleteBtn"
+              class="flex-1 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
+            >
+              إلغاء
+            </button>
+            <button
+              type="button"
+              id="confirmDeleteBtn"
+              class="flex-1 rounded-lg border border-red-300 bg-red-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-700"
+            >
+              حذف
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal للرسائل -->
+    <div
+      id="messageModal"
+      class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40 p-4"
+    >
+      <div
+        class="w-full max-w-md rounded-2xl border border-slate-200 bg-white shadow-lg"
+      >
+        <div class="p-5">
+          <h2
+            id="messageTitle"
+            class="mb-2 text-base font-semibold text-slate-900"
+          >
+            عنوان الرسالة
+          </h2>
+          <p id="messageText" class="mb-6 text-sm text-slate-600">
+            نص الرسالة
+          </p>
+          <div class="flex justify-end">
+            <button
+              type="button"
+              id="closeMessageModal"
+              class="rounded-lg border border-slate-900 bg-slate-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-800"
+            >
+              موافق
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SQL.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.js"></script>
+    
+    <script src="./links-data.js"></script>
+    <script src="./database.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>
+
